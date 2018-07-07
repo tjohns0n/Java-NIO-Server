@@ -1,0 +1,67 @@
+--------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------README-----------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------
+Building:
+    make
+--------------------------------------------------------------------------------------------------------------------------------    
+Running:
+    Registry:
+        cs455.overlay.node.Registry [port] # Port is optional, will find it's own port if not provided
+    MessagingNode:
+        cs455.overlay.node.MessagingNode [registry address] [registry port]
+--------------------------------------------------------------------------------------------------------------------------------
+Functionality constraints:
+    - Cannot handle nodes disconnecting after the overlay is setup
+    - Cannot redefine overlay after overlay is setup
+    - Cannot handle forceful exit by MessagingNodes (ctrl + c or pkill)
+--------------------------------------------------------------------------------------------------------------------------------
+File overview:
+The file structure for the project is as follows:
+cs455 - Main Java package
+    |-overlay - Contains all Java files for this project
+        |-messages - Contains all wireformats 
+            |-Message.java - Super class of all wireformats, also contains static methods for reading in a message from a socket
+            |-MessageTypeConstants.java - Defines the numeric type of each wireformat
+            |-NodeReportsOverlaySetupStatusMessage.java
+            |-OverlayNodeReportsTaskFinishedMessage.java
+            |-OverlayNodeReportsTrafficSummaryMessage.java
+            |-OverlayNodeSendsDataMessage.java
+            |-OverlayNodeSendsDeregistrationMessage.java
+            |-OverlayNodeSendsRegistrationMessage.java
+            |-RegistryReportsDeregistrationStatusMessage.java
+            |-RegistryReportsRegistrationStatusMessage.java
+            |-RegistryRequestsTaskInitiateMessage.java
+            |-RegistryRequestsTrafficSummaryMessage.java
+            |-RegistrySendsNodeManifestMessage.java
+        |-node - Wrappers for nodes
+            |-MessagingNode.java - Wrapper for cs455.overlay.nodes.MessengerNode (to conform to grading spec)
+            |-Registry.java - Wrapper for cs455.overlay.nodes.RegistryNode (to conform to grading spec) 
+        |-nodes - Contains the Registry and Messaging nodes, as well as their necessary components
+            |-events - Handle incoming messages
+                |-OverlayEventHandlers.java	- Handle events related to overlay setup messages
+                |-RegistrationEventHandlers.java - Handle events related to registration messages
+                |-Responder.java - Demuxes messages to specific event handlers
+                |-TaskEventHandlers.java - Handle events related to task messages
+                |-TrafficEventHandlers.java - Handle events related to traffic summary messages
+            |-networking - All networking components for nodes
+                |-NodeConnection.java - Holds a socket and starts threads for Sender and Receiver
+                |-NodeConnectionReceiver.java - Receives messages for a NodeConnection
+                |-NodeConnectionSender.java - Sends messages for a NodeConnection
+                |-NodeServer.java - Holds a ServerSocket for a Node and accepts incoming connections
+                |-Router.java - Generate and route task messages
+                |-RoutingTable.java - Holds the routing table for each MessagingNode
+            |-registry - Registry-specific components
+                |-Registry.java - Maintains information about MessagingNodes for a RegistryNode
+                |-RegistryConstants.java - Defines numeric values for registration errors
+                |-RegistryItem.java - Information about a single node in the registry
+            |-statistics - Tracks statistics for a task
+                |-MessageCounters.java - Keeps track of messages sent, relayed, received for each node
+                |-TrafficSummary.java - Construct a table from traffic summaries
+            |-CommandConstants.java - Defines valid user input strings
+            |-MessengerNode.java - Main class for a MessagingNode, extends Node
+            |-Node.java - Superclass for the nodes in a system
+            |-RegistryNode.java - Main class for the Registry, extends Node
+    |-Debug.java - Enable or disable debugging print statements
+Makefile
+README
+--------------------------------------------------------------------------------------------------------------------------------
